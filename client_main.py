@@ -7,20 +7,31 @@ import time
 import os
 from socket import AF_INET, SOCK_STREAM
 from socket import socket as Socket
+import traceback
 
 from basic_lib import console, flags, pack_processor, wdt,utils
 
-
-#USERNAME,PASSWORD=input("Username >> "),input("Password >> ")
-USERNAME,PASSWORD="YL12c","ccccc"
+default_settings={"addr":"127.0.0.1","port":14514,"username":"user","password":"sbbbbbbbbbbb","debug":0}
+try:
+    f=open("./client_config.json","r")
+    default_settings.update(json.loads(f.read()))
+except:
+    f=open("./client_config.json","w")
+    f.write(json.dumps(default_settings,indent=1))
+finally:
+    try:f.close()
+    except:pass
+USERNAME=default_settings["username"]
+PASSWORD=default_settings["password"]
+ADDR=default_settings["addr"]
+PORT=default_settings["port"]
+DEBUG=default_settings["debug"]
 
 class Client:
     def __init__(self):
         global print
         self.timeout_cnt=0
         self.conn=Socket(AF_INET,SOCK_STREAM)
-        #self.conn.connect(("mc.icyiso.xyz",14514))
-        self.conn.connect(("127.0.0.1",14514))
         self.parser=pack_processor.Parser(self.conn,int(),timeout=0.025)
         self.send=pack_processor.Sender(self.conn)
         self.timer=wdt.Wdt()
@@ -64,6 +75,9 @@ class Client:
         return 1
 
     def _main(self):
+        print("Connecting")
+        self.conn.connect((ADDR,PORT))
+        print("Successfully connected to server (%s,%d)"%(ADDR,PORT))
         self.login(USERNAME,PASSWORD)
         self.timer.new_timer("ping",20)
         while 1:
@@ -79,6 +93,9 @@ class Client:
         try:
             self._main()
         except:
+            if DEBUG:
+                traceback.print_exc()
+            input("Press any key to exit.")
             self.conn.close()
             os._exit(0)
                 

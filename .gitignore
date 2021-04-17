@@ -128,4 +128,5 @@ chat.db
 look.sql
 users.db
 server_config.json
+client_config.json
 .vscode/

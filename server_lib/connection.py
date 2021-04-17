@@ -76,6 +76,7 @@ class ClientConnection(Connection):
                 else:
                     self.send_msg_as_server("Login failed.")
                     self.logger.warning("Login failed.")
+                    time.sleep(1)
                     return 0
             elif flag==flags.FLAG_PING:
                 #print("pang!",data)
